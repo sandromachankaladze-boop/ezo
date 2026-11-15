@@ -1,8 +1,10 @@
 import { StyleSheet, View } from 'react-native';
 import { ArcadeWindow } from '@/components/arcade/ArcadeWindow';
+import { CoinRewardWindow } from '@/components/arcade/CoinRewardWindow';
 import { NeonLetter } from '@/components/arcade/NeonLetter';
 import { PixelButton } from '@/components/arcade/PixelButton';
 import { Txt } from '@/components/Txt';
+import { RewardLine } from '@/economy/rules';
 import { t } from '@/i18n';
 import { arcade } from '@/theme';
 import { RoundResult } from '../logic/scoring';
@@ -14,11 +16,12 @@ type Props = {
   result: RoundResult;
   best: number;
   newRecord: boolean;
+  reward: RewardLine[];
   onAgain: () => void;
 };
 
 // Solo round result: score, each answer with its verdict, time bonus, record.
-export function ResultView({ letter, result, best, newRecord, onAgain }: Props) {
+export function ResultView({ letter, result, best, newRecord, reward, onAgain }: Props) {
   return (
     <>
       <View style={styles.topRow}>
@@ -67,6 +70,7 @@ export function ResultView({ letter, result, best, newRecord, onAgain }: Props) 
         </View>
       </ArcadeWindow>
 
+      {reward.length > 0 && <CoinRewardWindow lines={reward} />}
       <Txt style={styles.best}>{t.qalaqebi.best(best)}</Txt>
       <PixelButton title={t.qalaqebi.again} onPress={onAgain} />
     </>

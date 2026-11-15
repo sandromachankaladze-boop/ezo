@@ -4,17 +4,22 @@ import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNav } from '@/components/arcade/BottomNav';
+import { CoinCounter } from '@/components/arcade/CoinCounter';
 import { CoinDoor } from '@/components/arcade/CoinDoor';
 import { ControlDeck } from '@/components/arcade/ControlDeck';
 import { CrtScreen } from '@/components/arcade/CrtScreen';
 import { Marquee } from '@/components/arcade/Marquee';
 import { PixelIcon } from '@/components/arcade/PixelIcon';
+import { PocketMoneyCard } from '@/components/arcade/PocketMoneyCard';
 import { SafetyCard } from '@/components/arcade/SafetyCard';
 import { YardBackground } from '@/components/arcade/YardBackground';
 import { Txt } from '@/components/Txt';
+import { pocketMoneyToday } from '@/economy/rules';
+import { useWallet } from '@/hooks/useWallet';
 import { t } from '@/i18n';
 import { ROUTES } from '@/navigation/routes';
 import { getBestScore, getFlag, setFlag } from '@/services/storage';
+import { collectPocketMoney } from '@/services/wallet';
 import { arcade } from '@/theme';
 
 type Game = {
@@ -28,6 +33,10 @@ export default function HomeScreen() {
   const [sel, setSel] = useState(0);
   const [best, setBest] = useState(0);
   const [showSafety, setShowSafety] = useState(false);
+  const [safetyChecked, setSafetyChecked] = useState(false);
+  const { wallet, loaded } = useWallet();
+  // grandma's card waits until the safety card is closed
+  const gift = loaded && safetyChecked && !showSafety ? pocketMoneyToday(wallet, new Date()) : null;
 
   // Refresh the record every time we come back to the home screen
   useFocusEffect(
@@ -38,7 +47,10 @@ export default function HomeScreen() {
 
   // First launch: show the "passengers only" card once
   useEffect(() => {
-    getFlag('safetySeen').then((seen) => !seen && setShowSafety(true));
+    getFlag('safetySeen').then((seen) => {
+      if (!seen) setShowSafety(true);
+      setSafetyChecked(true);
+    });
   }, []);
 
   const selected = GAMES[sel];
@@ -69,6 +81,7 @@ export default function HomeScreen() {
                   {best}
                 </Txt>
               </View>
+              <CoinCounter />
             </View>
 
             <Txt weight="bold" style={styles.choose}>
@@ -116,6 +129,8 @@ export default function HomeScreen() {
         </View>
       </SafeAreaView>
       <BottomNav active="home" />
+
+      <PocketMoneyCard gift={gift} onCollect={() => collectPocketMoney()} />
 
       <SafetyCard
         visible={showSafety}

@@ -1,8 +1,11 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ArcadeShell } from '@/components/arcade/ArcadeShell';
+import { InsertCoin } from '@/components/arcade/InsertCoin';
+import { duelReward, RewardLine, soloReward, sumReward } from '@/economy/rules';
 import { t } from '@/i18n';
 import { getBestScore, setBestScore } from '@/services/storage';
+import { earnCoins } from '@/services/wallet';
 import { Category } from '../logic/categories';
 import { LETTERS } from '../logic/dictionary';
 import { DuelResult, scoreDuel, Turn } from '../logic/duel';
@@ -17,8 +20,8 @@ const GAME_ID = 'qalaqebi';
 const EMPTY: Record<Category, string> = { city: '', country: '', animal: '', thing: '' };
 
 type Mode = 'solo' | 'duel';
-// intro -> playing -> (duel only: handoff -> playing) -> result
-type Phase = 'intro' | 'playing' | 'handoff' | 'result';
+// intro -> insert coin -> playing -> (duel only: handoff -> playing) -> result
+type Phase = 'intro' | 'insert' | 'playing' | 'handoff' | 'result';
 
 export default function QalaqebiScreen() {
   const [mode, setMode] = useState<Mode>('solo');
@@ -33,6 +36,7 @@ export default function QalaqebiScreen() {
   const [duelResult, setDuelResult] = useState<DuelResult | null>(null);
   const [best, setBest] = useState(0);
   const [newRecord, setNewRecord] = useState(false);
+  const [reward, setReward] = useState<RewardLine[]>([]);
 
   // Best score (solo only) is stored on the phone
   useEffect(() => {
@@ -67,7 +71,13 @@ export default function QalaqebiScreen() {
     setSoloResult(null);
     setDuelResult(null);
     setNewRecord(false);
-    beginTurn();
+    setReward([]);
+    setPhase('insert'); // the round starts once a coin is inserted
+  }
+
+  function giveReward(lines: RewardLine[]) {
+    setReward(lines);
+    earnCoins(sumReward(lines));
   }
 
   function finishTurn() {
@@ -75,13 +85,15 @@ export default function QalaqebiScreen() {
 
     if (mode === 'solo') {
       const r = scoreRound(letter, turn.answers, turn.secondsLeft);
+      const isRecord = r.total > best;
       setSoloResult(r);
       setPhase('result');
-      if (r.total > best) {
+      if (isRecord) {
         setBest(r.total);
         setNewRecord(true);
         setBestScore(GAME_ID, r.total);
       }
+      giveReward(soloReward(r.total, isRecord));
       return;
     }
 
@@ -91,8 +103,10 @@ export default function QalaqebiScreen() {
       setPlayer(1);
       setPhase('handoff');
     } else {
-      setDuelResult(scoreDuel(letter, firstTurn!, turn));
+      const d = scoreDuel(letter, firstTurn!, turn);
+      setDuelResult(d);
       setPhase('result');
+      giveReward(duelReward(d.winner !== 'tie'));
     }
   }
 
@@ -138,6 +152,8 @@ export default function QalaqebiScreen() {
         />
       )}
 
+      {phase === 'insert' && <InsertCoin duel={mode === 'duel'} onPaid={beginTurn} />}
+
       {phase === 'handoff' && <Handoff player={player + 1} onGo={beginTurn} />}
 
       {phase === 'result' && mode === 'solo' && soloResult && (
@@ -146,6 +162,7 @@ export default function QalaqebiScreen() {
           result={soloResult}
           best={best}
           newRecord={newRecord}
+          reward={reward}
           onAgain={() => startGame('solo')}
         />
       )}
@@ -154,6 +171,7 @@ export default function QalaqebiScreen() {
         <DuelResultView
           letter={letter}
           result={duelResult}
+          reward={reward}
           onRematch={() => startGame('duel')}
           onSolo={() => startGame('solo')}
         />

@@ -25,8 +25,11 @@ src/
   components/           shared UI: Txt (text with the Georgian font)
     arcade/             "Yard Arcade" pieces: ArcadeShell (standard game screen), YardBackground,
                         Marquee, CompactMarquee, CrtScreen, ControlDeck, CoinDoor, BottomNav,
-                        ArcadeWindow, PixelButton, NeonLetter, PixelIcon, SafetyCard, Patterns
-  services/             storage (storage.ts); later backend, ads
+                        ArcadeWindow, PixelButton, NeonLetter, PixelIcon, SafetyCard, Patterns,
+                        CoinCounter, PocketMoneyCard, InsertCoin, CoinRewardWindow
+  economy/              coin rules (rules.ts): pocket money, round cost, rewards, credit. No React
+  hooks/                React hooks (useWallet: live coin balance)
+  services/             storage.ts (records, flags), wallet.ts (coins on the phone); later backend, ads
   i18n/
     ka.ts               all Georgian UI text (t.home.title, t.qalaqebi.start ...)
     content/            game content: word lists (qalaqebi-words.ts)
@@ -43,6 +46,7 @@ docs/design-brief.md    visual direction ("Yard Arcade") + mockup link
 - **No hard-coded Georgian text or word lists in components.** UI text goes in `src/i18n/ka.ts`, words and content in `src/i18n/content/`.
 - Colors and fonts only from `@/theme`. New game screens use `ArcadeShell` (see docs/design-brief.md).
 - Data is saved only through `src/services/`; screens never use AsyncStorage directly.
+- Coins change only through `src/services/wallet.ts`; the numbers live in `src/economy/rules.ts`.
 - New route: a file in `src/app/` + its path in `src/navigation/routes.ts`.
 - Imports use the `@/...` alias (= `src/`).
 

@@ -4,8 +4,10 @@ import { t } from '@/i18n';
 import { arcade } from '@/theme';
 import { PixelIcon } from './PixelIcon';
 
-// Slim marquee for game screens: yellow back button + the game's name in neon.
-export function CompactMarquee({ title, onBack }: { title: string; onBack?: () => void }) {
+// Slim marquee for game screens: yellow back button, the game's name in neon, optional right slot.
+type Props = { title: string; onBack?: () => void; right?: React.ReactNode };
+
+export function CompactMarquee({ title, onBack, right }: Props) {
   return (
     <View style={styles.marquee}>
       {onBack && (
@@ -25,6 +27,7 @@ export function CompactMarquee({ title, onBack }: { title: string; onBack?: () =
         </Txt>
         <View style={styles.bulb} />
       </View>
+      {right}
     </View>
   );
 }

@@ -2,6 +2,20 @@
 
 Newest entry first: date, what we decided, why.
 
+## 2026-11-15: Pocket money: first version in the app
+**What is built:** wallet saved on the phone; grandma's card with daily pocket money (10 coins,
++2 per extra day in a row, max +10); "insert coin" before every round (2 players share one coin);
+rewards after a round (+1 round, +1 solo score 30+, +3 new record, +2 when a 2-player round has a
+winner); credit („ნისია“): with 0 coins one free round every 30 minutes.
+
+**Details decided while building:**
+- Earned coins are added automatically when the round ends (no "collect" tap that could be missed).
+- One wallet per phone: in 2-player mode the coins go to the phone, not to a player.
+- Not yet: coins for watching ads (needs an ad SDK with native code, not available in Expo Go),
+  the yard shop, and in-game help (+15 seconds, new letter).
+
+**Why:** the agreed option C, in the smallest version that can be tested on a phone.
+
 ## 2026-11-15: Visual direction "Yard Arcade"
 **Decision:** the app looks like an arcade cabinet standing in a Tbilisi yard at dusk
 (details in `docs/design-brief.md`). Fonts: Noto Sans Georgian for words, Press Start 2P

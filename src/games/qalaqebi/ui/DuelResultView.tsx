@@ -1,8 +1,10 @@
 import { StyleSheet, View } from 'react-native';
 import { ArcadeWindow } from '@/components/arcade/ArcadeWindow';
+import { CoinRewardWindow } from '@/components/arcade/CoinRewardWindow';
 import { NeonLetter } from '@/components/arcade/NeonLetter';
 import { PixelButton } from '@/components/arcade/PixelButton';
 import { Txt } from '@/components/Txt';
+import { RewardLine } from '@/economy/rules';
 import { t } from '@/i18n';
 import { arcade } from '@/theme';
 import { DuelResult } from '../logic/duel';
@@ -13,12 +15,13 @@ import { SHARED_COLOR, VERDICT_COLOR } from './verdictColors';
 type Props = {
   letter: string;
   result: DuelResult;
+  reward: RewardLine[];
   onRematch: () => void;
   onSolo: () => void;
 };
 
 // 2-player result: both players' answers side by side, totals and the winner.
-export function DuelResultView({ letter, result, onRematch, onSolo }: Props) {
+export function DuelResultView({ letter, result, reward, onRematch, onSolo }: Props) {
   const [p1, p2] = result.players;
   const banner = result.winner === 'tie' ? t.qalaqebi.tie : t.qalaqebi.winner(result.winner + 1);
 
@@ -71,6 +74,7 @@ export function DuelResultView({ letter, result, onRematch, onSolo }: Props) {
         <Total value={p2.total} win={result.winner === 1} />
       </View>
 
+      {reward.length > 0 && <CoinRewardWindow lines={reward} />}
       <PixelButton title={t.qalaqebi.rematch} onPress={onRematch} />
       <PixelButton title={t.qalaqebi.toSolo} onPress={onSolo} color={arcade.yellow} />
     </>
