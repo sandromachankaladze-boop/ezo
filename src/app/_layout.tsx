@@ -1,18 +1,47 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import {
+  NotoSansGeorgian_400Regular,
+  NotoSansGeorgian_700Bold,
+  NotoSansGeorgian_900Black,
+  useFonts,
+} from '@expo-google-fonts/noto-sans-georgian';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { colors, fonts } from '@/theme';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
-
+// ფონტის ჩატვირთვამდე საწყისი ეკრანი (splash) დარჩეს ხილული.
 SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
+  // ფონტი აპშივეა ჩაშენებული, ამიტომ ინტერნეტი არ სჭირდება (ოფლაინიც მუშაობს).
+  const [loaded, error] = useFonts({
+    NotoSansGeorgian_400Regular,
+    NotoSansGeorgian_700Bold,
+    NotoSansGeorgian_900Black,
+  });
+
+  useEffect(() => {
+    if (loaded || error) SplashScreen.hideAsync();
+  }, [loaded, error]);
+
+  if (!loaded && !error) return null;
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.paper },
+          headerTintColor: colors.ink,
+          headerTitleStyle: { fontFamily: fonts.bold, color: colors.ink },
+          headerShadowVisible: false,
+          headerBackTitle: 'უკან',
+          contentStyle: { backgroundColor: colors.paper },
+        }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="qalaqebi" options={{ title: 'ქალაქები' }} />
+      </Stack>
+    </>
   );
 }
