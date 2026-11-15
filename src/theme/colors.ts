@@ -1,6 +1,4 @@
-// აპის საერთო ფერები და ფონტები ("რვეულის" სტილი).
-// ფერის შესაცვლელად საკმარისია აქ შეცვლა: ყველა ეკრანი აქედან იღებს.
-
+// აპის ფერები ("რვეულის" სტილი). ფერის შესაცვლელად საკმარისია აქ შეცვლა.
 export const colors = {
   paper: '#FBFAF4', // რვეულის ფურცელი
   grid: '#D6E4F0', // უჯრების ხაზები
@@ -14,12 +12,3 @@ export const colors = {
   card: '#FFFFFF',
   sticker: '#FFF3B0', // ყვითელი სტიკერი
 };
-
-export const fonts = {
-  regular: 'NotoSansGeorgian_400Regular',
-  bold: 'NotoSansGeorgian_700Bold',
-  black: 'NotoSansGeorgian_900Black',
-};
-
-// რვეულის ერთი უჯრის ზომა პიქსელებში
-export const CELL = 24;

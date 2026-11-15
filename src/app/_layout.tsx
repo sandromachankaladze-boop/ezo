@@ -8,7 +8,8 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { colors, fonts } from '@/theme';
+import { t } from '@/i18n';
+import { stackScreenOptions } from '@/navigation/stackOptions';
 
 // ფონტის ჩატვირთვამდე საწყისი ეკრანი (splash) დარჩეს ხილული.
 SplashScreen.preventAutoHideAsync();
@@ -30,17 +31,9 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.paper },
-          headerTintColor: colors.ink,
-          headerTitleStyle: { fontFamily: fonts.bold, color: colors.ink },
-          headerShadowVisible: false,
-          headerBackTitle: 'უკან',
-          contentStyle: { backgroundColor: colors.paper },
-        }}>
+      <Stack screenOptions={stackScreenOptions}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="qalaqebi" options={{ title: 'ქალაქები' }} />
+        <Stack.Screen name="qalaqebi" options={{ title: t.games.qalaqebi.title }} />
       </Stack>
     </>
   );

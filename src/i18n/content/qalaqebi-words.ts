@@ -1,23 +1,17 @@
 // "ქალაქების" ჩაშენებული ლექსიკონი. მუშაობს ოფლაინ, ინტერნეტის გარეშე.
 // ახალი სიტყვის დასამატებლად ჩაწერე ის შესაბამის სიაში მძიმით.
-// თუ მოთამაშის სიტყვა სიაში არ არის, ქულის ნაწილს მაინც იღებს (იხ. logic.ts).
+// თუ მოთამაშის სიტყვა სიაში არ არის, ქულის ნაწილს მაინც იღებს
+// (იხ. src/games/qalaqebi/logic/scoring.ts).
 
-export type Category = 'city' | 'country' | 'animal' | 'thing';
-
-export const CATEGORIES: { key: Category; label: string; emoji: string }[] = [
-  { key: 'city', label: 'ქალაქი', emoji: '🏙️' },
-  { key: 'country', label: 'ქვეყანა', emoji: '🌍' },
-  { key: 'animal', label: 'ცხოველი', emoji: '🐾' },
-  { key: 'thing', label: 'ნივთი', emoji: '🎒' },
-];
+import type { Category } from '@/games/qalaqebi/logic/categories';
 
 // ასოები, რომლებზეც ყველა კატეგორიაში მოიძებნება პასუხი.
-export const LETTERS = [
+export const QALAQEBI_LETTERS = [
   'ა', 'ბ', 'გ', 'დ', 'ე', 'ვ', 'ზ', 'თ', 'ი', 'კ', 'ლ', 'მ',
   'ნ', 'პ', 'ს', 'ტ', 'ფ', 'ქ', 'შ', 'ჩ', 'ხ', 'ჯ',
 ];
 
-const RAW: Record<Category, string> = {
+export const QALAQEBI_WORDS: Record<Category, string> = {
   city: `
     ათენი, ამსტერდამი, ანკარა, ასტანა, ალმათი, ახალციხე, ამბროლაური, ახმეტა, აბაშა, ადიგენი, ასპინძა, ახალქალაქი,
     ბათუმი, ბერლინი, ბაქო, ბორჯომი, ბოლნისი, ბრიუსელი, ბუდაპეშტი, ბარსელონა, ბუქარესტი, ბაღდადი, ბოსტონი, ბანგკოკი, ბერნი, ბელგრადი, ბრატისლავა, ბაღდათი,
@@ -133,28 +127,3 @@ const RAW: Record<Category, string> = {
     წიგნი, წინდა, ჭიქა, ჭურჭელი, ჰანტელი
   `,
 };
-
-// სიტყვის "გასუფთავება" შედარებისთვის: ჰარები, დეფისები და დიდი (მთავრული) ასოები.
-export function normalize(word: string): string {
-  return Array.from(word.trim())
-    .map((ch) => {
-      const code = ch.codePointAt(0)!;
-      // მთავრული (Ა-Ჿ) -> მხედრული (ა-ჿ)
-      if (code >= 0x1c90 && code <= 0x1cbf) return String.fromCodePoint(code - 0x1c90 + 0x10d0);
-      return ch;
-    })
-    .join('')
-    .replace(/[\s\-–—.]/g, '');
-}
-
-export const DICTIONARY: Record<Category, Set<string>> = Object.fromEntries(
-  (Object.keys(RAW) as Category[]).map((cat) => [
-    cat,
-    new Set(
-      RAW[cat]
-        .split(',')
-        .map(normalize)
-        .filter(Boolean),
-    ),
-  ]),
-) as Record<Category, Set<string>>;
