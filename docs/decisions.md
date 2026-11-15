@@ -2,6 +2,32 @@
 
 Newest entry first: date, what we decided, why.
 
+## 2026-11-15: Coin economy: "pocket money" (option C)
+**Options considered:**
+- A: every round costs a coin.
+- B: games are free and coins buy extras.
+- C: daily free "pocket money", then rounds cost coins, and coins also buy extras.
+
+**Decision:** C, "pocket money" („ჯიბის ფული“).
+- Every day the player gets free coins (pocket money). A round costs 1 coin.
+- Coins are earned by playing (score, wins, records, daily streak) and by watching a rewarded ad.
+- Coins are also spent on extras: in-game help (more time, new letter) and yard items
+  (toys and chalk drawings that appear in the lobby), plus cosmetics.
+- No random loot boxes. Coins are stored on the phone and work offline.
+- Exact numbers are still to be tuned (see the proposal in chat; to be confirmed).
+
+**Why:** strongest nostalgic story (grandma's pocket money, the arcade coin slot) and more
+ad value than "always free", while the daily allowance keeps the game playable offline.
+
+**Risk to watch:** too stingy and players leave. Players with no coins and no internet
+(no ads) must still have a way to play.
+
+## 2026-11-15: Driver warning placement
+**Decision:** the warning is removed from the main screens (replaced by bottom navigation).
+It is shown once as a card on first launch, and permanently in Settings.
+
+**Why:** keeps the screens clean while still meeting the plan's safety requirement.
+
 ## 2026-11-15: "qalaqebi" 2-player mode
 **Decision:**
 - Pass-and-play on one phone: same letter for both, Player 1 plays 60 s, a hand-off
