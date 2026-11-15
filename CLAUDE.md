@@ -23,14 +23,17 @@ src/
       ui/               the screen and its parts
     qalaqebi/           Cities game (always named "qalaqebi": folder, route, files, storage key)
   components/           shared UI: Txt, InkButton, NotebookBackground
+    arcade/             "Yard Arcade" pieces: YardBackground, Marquee, CrtScreen, ControlDeck,
+                        CoinDoor, BottomNav, PixelIcon, SafetyCard, Patterns
   services/             storage (storage.ts); later backend, ads
   i18n/
     ka.ts               all Georgian UI text (t.home.title, t.qalaqebi.start ...)
     content/            game content: word lists (qalaqebi-words.ts)
-  theme/                colors.ts, fonts.ts, CELL (grid cell size)
+  theme/                colors.ts (`arcade` = new palette), fonts.ts (incl. pixel font), CELL
   utils/                general helpers (georgian.ts: normalize, Mtavruli -> Mkhedruli)
 assets/                 icons, images (still the Expo template ones, to be replaced)
 docs/decisions.md       decisions log
+docs/design-brief.md    visual direction ("Yard Arcade") + mockup link
 ```
 
 ## Code rules

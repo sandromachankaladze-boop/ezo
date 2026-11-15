@@ -2,6 +2,16 @@
 
 Newest entry first: date, what we decided, why.
 
+## 2026-11-15: Visual direction "Yard Arcade"
+**Decision:** the app looks like an arcade cabinet standing in a Tbilisi yard at dusk
+(details in `docs/design-brief.md`). Fonts: Noto Sans Georgian for words, Press Start 2P
+for numbers. The notebook style survives only as neon grid paper inside paper games.
+The Cities game is shown to players as „ქალაქობანა“ (code name stays `qalaqebi`).
+Screens move to the new style one at a time; the home screen is first.
+
+**Why:** chosen by the owner from a clickable mockup; combines arcade nostalgia with the
+meaning of „ეზო“ (the shared yard of childhood).
+
 ## 2026-11-15: Coin economy: "pocket money" (option C)
 **Options considered:**
 - A: every round costs a coin.

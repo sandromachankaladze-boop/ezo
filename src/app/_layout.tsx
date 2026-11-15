@@ -4,6 +4,7 @@ import {
   NotoSansGeorgian_900Black,
   useFonts,
 } from '@expo-google-fonts/noto-sans-georgian';
+import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -20,6 +21,7 @@ export default function RootLayout() {
     NotoSansGeorgian_400Regular,
     NotoSansGeorgian_700Bold,
     NotoSansGeorgian_900Black,
+    PressStart2P_400Regular,
   });
 
   useEffect(() => {
