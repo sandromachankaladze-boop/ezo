@@ -10,7 +10,7 @@ import { colors } from '@/theme';
 type Game = {
   id: keyof typeof t.games;
   emoji: string;
-  route?: typeof ROUTES.qalaqebi; // თუ route არ აქვს, თამაში ჯერ მზად არ არის
+  route?: typeof ROUTES.qalaqebi; // no route = game not ready yet
 };
 
 const GAMES: Game[] = [

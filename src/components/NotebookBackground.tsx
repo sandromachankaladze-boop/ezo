@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, View, ViewProps } from 'react-native';
 import { CELL, colors } from '@/theme';
 
-// ეკრანის ფონი რვეულის უჯრებით და წითელი ველის ხაზით.
+// Screen background: notebook grid with a red margin line.
 export function NotebookBackground({ children, style, ...rest }: ViewProps) {
   const [size, setSize] = useState({ w: 0, h: 0 });
 

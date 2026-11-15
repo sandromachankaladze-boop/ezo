@@ -11,11 +11,11 @@ import { useEffect } from 'react';
 import { t } from '@/i18n';
 import { stackScreenOptions } from '@/navigation/stackOptions';
 
-// ფონტის ჩატვირთვამდე საწყისი ეკრანი (splash) დარჩეს ხილული.
+// Keep the splash screen visible until the font has loaded.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  // ფონტი აპშივეა ჩაშენებული, ამიტომ ინტერნეტი არ სჭირდება (ოფლაინიც მუშაობს).
+  // The font is bundled with the app, so it works offline.
   const [loaded, error] = useFonts({
     NotoSansGeorgian_400Regular,
     NotoSansGeorgian_700Bold,

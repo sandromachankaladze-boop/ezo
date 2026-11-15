@@ -1,6 +1,6 @@
-// ქართული ტექსტის დამხმარე ფუნქციები.
+// Helpers for Georgian text.
 
-// მთავრული (Ა-Ჿ) -> მხედრული (ა-ჿ)
+// Mtavruli capitals (U+1C90-U+1CBF) -> Mkhedruli (U+10D0-U+10FF)
 export function toMkhedruli(text: string): string {
   return Array.from(text)
     .map((ch) => {
@@ -11,7 +11,7 @@ export function toMkhedruli(text: string): string {
     .join('');
 }
 
-// სიტყვის "გასუფთავება" შედარებისთვის: ჰარები, დეფისები, წერტილები და მთავრული ასოები.
+// Clean a word for comparison: strip spaces, hyphens, dots; convert capitals.
 export function normalize(word: string): string {
   return toMkhedruli(word.trim()).replace(/[\s\-–—.]/g, '');
 }

@@ -1,5 +1,5 @@
-// აპის მთელი ქართული ტექსტი ერთ ადგილას.
-// კომპონენტებში ქართულ ტექსტს პირდაპირ არ ვწერთ, აქედან ვიღებთ: t.home.title და ა.შ.
+// All Georgian app text in one place.
+// Components never hard-code Georgian text; they read it from here: t.home.title etc.
 
 export const ka = {
   common: {

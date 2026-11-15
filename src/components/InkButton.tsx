@@ -10,7 +10,7 @@ type Props = {
   style?: ViewStyle;
 };
 
-// დიდი ღილაკი, რომელსაც ერთი ხელის ცერით მარტივად დააჭერ.
+// Big button, easy to press with one thumb.
 export function InkButton({ title, onPress, variant = 'primary', disabled, style }: Props) {
   const primary = variant === 'primary';
   return (

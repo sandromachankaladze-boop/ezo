@@ -4,7 +4,7 @@ import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { colors } from '@/theme';
 
-// წესები და "დავიწყოთ!" ღილაკი
+// Rules and the start button
 export function Intro({ best, onStart }: { best: number; onStart: () => void }) {
   return (
     <>

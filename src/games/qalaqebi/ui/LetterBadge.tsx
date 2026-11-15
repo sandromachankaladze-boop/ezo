@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Txt } from '@/components/Txt';
 import { colors } from '@/theme';
 
-// დიდი წითელი ასო (თითქოს მასწავლებელმა დაწერა)
+// Big red letter, as if written by a teacher
 export function LetterBadge({ letter }: { letter: string }) {
   return (
     <View style={styles.box}>

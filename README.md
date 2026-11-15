@@ -1,18 +1,18 @@
-# ეზო
+# Ezo
 
-ბავშვობის თამაშები ქართველი ჯენზისთვის: მოკლე, ოფლაინ, ერთი ხელით სათამაშო.
-დეტალები: [PLAN.md](PLAN.md), წესები: [CLAUDE.md](CLAUDE.md), გადაწყვეტილებები: [docs/decisions.md](docs/decisions.md).
+Childhood games for Georgian Gen Z: short, offline, playable with one hand.
+Details: [PLAN.md](PLAN.md), rules: [CLAUDE.md](CLAUDE.md), decisions: [docs/decisions.md](docs/decisions.md).
 
-## გაშვება
+## Run
 
 ```bash
 npm install
 npx expo start
 ```
 
-ტელეფონზე დააყენე **Expo Go** და დაასკანერე QR კოდი. ბრაუზერში სანახავად ტერმინალში დააჭირე `w`-ს.
+Install **Expo Go** on your phone and scan the QR code. To see it in a browser, press `w` in the terminal.
 
-## შემოწმება
+## Check
 
 ```bash
 npx tsc --noEmit && npx expo lint

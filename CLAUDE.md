@@ -1,50 +1,52 @@
-# ეზო: ბავშვობის თამაშები ქართველი ჯენზისთვის
+# Ezo: childhood games for Georgian Gen Z
 
-პროდუქტის გეგმა: @PLAN.md
-Expo-ს ზოგადი წესები და ბრძანებები: @AGENTS.md
-მიღებული გადაწყვეტილებები: docs/decisions.md
+Product plan: @PLAN.md
+General Expo rules and commands: @AGENTS.md
+Decisions log: docs/decisions.md
 
-## ტექნოლოგია
-React Native + Expo (SDK 58), Expo Router, TypeScript. ოფლაინ რეჟიმი სავალდებულოა.
+## Tech
+React Native + Expo (SDK 58), Expo Router, TypeScript. Offline mode is required.
 
-## საქაღალდეები
+## Folder layout
 
 ```
 src/
-  app/                  Expo Router მარშრუტები. მხოლოდ მოკლე ფაილები, რომლებიც ეკრანს აბრუნებს
-    _layout.tsx         ფონტების ჩატვირთვა + ნავიგაციის Stack
+  app/                  Expo Router routes. Thin files only: each re-exports a screen
+    _layout.tsx         font loading + navigation Stack
     index.tsx           "/"         -> screens/HomeScreen
     qalaqebi.tsx        "/qalaqebi" -> games/qalaqebi/ui/QalaqebiScreen
-  navigation/           routes.ts (მისამართები), stackOptions.ts (header-ის სტილი)
-  screens/              არა-სათამაშო ეკრანები (HomeScreen.tsx)
+  navigation/           routes.ts (paths), stackOptions.ts (header style)
+  screens/              non-game screens (HomeScreen.tsx)
   games/
-    <თამაში>/           ერთი საქაღალდე თითო თამაშზე
-      logic/            წესები და ქულები, React/UI-ს გარეშე
-      ui/               ეკრანი და მისი ნაწილები
-    qalaqebi/           "ქალაქები" (სახელი ყველგან ასე: საქაღალდე, მარშრუტი, ფაილები, შენახვის გასაღები)
-  components/           საერთო UI: Txt, InkButton, NotebookBackground
-  services/             შენახვა (storage.ts), მომავალში ბექენდი, რეკლამა
+    <game>/             one folder per game
+      logic/            rules and scoring, no React/UI
+      ui/               the screen and its parts
+    qalaqebi/           Cities game (always named "qalaqebi": folder, route, files, storage key)
+  components/           shared UI: Txt, InkButton, NotebookBackground
+  services/             storage (storage.ts); later backend, ads
   i18n/
-    ka.ts               აპის მთელი ქართული ტექსტი (t.home.title, t.qalaqebi.start ...)
-    content/            სათამაშო კონტენტი: სიტყვების სიები (qalaqebi-words.ts)
-  theme/                colors.ts, fonts.ts, CELL (უჯრის ზომა)
-  utils/                ზოგადი ფუნქციები (georgian.ts: normalize, მთავრული -> მხედრული)
-assets/                 აიკონები, სურათები (ჯერ Expo-ს შაბლონისაა, შესაცვლელია)
-docs/decisions.md       გადაწყვეტილებების ჟურნალი
+    ka.ts               all Georgian UI text (t.home.title, t.qalaqebi.start ...)
+    content/            game content: word lists (qalaqebi-words.ts)
+  theme/                colors.ts, fonts.ts, CELL (grid cell size)
+  utils/                general helpers (georgian.ts: normalize, Mtavruli -> Mkhedruli)
+assets/                 icons, images (still the Expo template ones, to be replaced)
+docs/decisions.md       decisions log
 ```
 
-## წესები
-- **ერთი ეკრანი, ერთი ფაილი.** `src/app/`-ის ფაილი მხოლოდ ეკრანს ახსენებს, კოდი `screens/`-ში ან `games/<თამაში>/ui/`-შია.
-- **ერთი საქაღალდე თითო თამაშზე**, სადაც `logic/` (წესები, ქულები) `ui/`-ისგან გამოყოფილია. `logic/` React-ს არ იყენებს.
-- **ქართული ტექსტი და სიტყვების სიები კომპონენტებში პირდაპირ არ იწერება.** ტექსტი `src/i18n/ka.ts`-შია, სიტყვები და კონტენტი `src/i18n/content/`-ში. კომენტარები ქართულად შეიძლება.
-- ფერები და ფონტები მხოლოდ `@/theme`-დან.
-- მონაცემების შენახვა მხოლოდ `src/services/`-ით, AsyncStorage-ს პირდაპირ ეკრანიდან არ ვიყენებთ.
-- ახალი მარშრუტი: ფაილი `src/app/`-ში + მისამართი `src/navigation/routes.ts`-ში.
-- იმპორტები `@/...` ალიასით (= `src/`).
+## Code rules
+- **One screen per file.** A file in `src/app/` only re-exports a screen; the code lives in `screens/` or `games/<game>/ui/`.
+- **One folder per game**, with `logic/` (rules, scoring) separate from `ui/`. `logic/` does not import React.
+- **No hard-coded Georgian text or word lists in components.** UI text goes in `src/i18n/ka.ts`, words and content in `src/i18n/content/`.
+- Colors and fonts only from `@/theme`.
+- Data is saved only through `src/services/`; screens never use AsyncStorage directly.
+- New route: a file in `src/app/` + its path in `src/navigation/routes.ts`.
+- Imports use the `@/...` alias (= `src/`).
 
-## მუშაობის წესი
-- ერთ ჯერზე ერთი პატარა ამოცანა. ყოველი ნაბიჯის შემდეგ: `npx tsc --noEmit`, `npx expo lint` და აპის გაშვება.
-- ახსნა მარტივად, ქართულად. მნიშვნელოვანი ტექნიკური არჩევანის წინ 2-3 ვარიანტის შეთავაზება.
-- მნიშვნელოვანი გადაწყვეტილება ჩაიწერება `docs/decisions.md`-ში თარიღით.
-- ამ გარემოში `npx expo install` ქსელის გამო არ მუშაობს. ვერსიას ვიღებთ
-  `node_modules/expo/bundledNativeModules.json`-დან და ვაყენებთ `npm install <პაკეტი>@<ვერსია>`-ით.
+## Working rules
+- Always communicate in English. Georgian is used only for app content.
+- File names, folder names, commit messages, code comments and docs are in English.
+- One small task at a time. After each step: `npx tsc --noEmit`, `npx expo lint`, and run the app.
+- Explain simply; the owner has little programming experience. Offer 2-3 options before any important technical choice.
+- Record important decisions in `docs/decisions.md` with the date.
+- In this environment `npx expo install` fails (network). Take the version from
+  `node_modules/expo/bundledNativeModules.json` and run `npm install <package>@<version>`.

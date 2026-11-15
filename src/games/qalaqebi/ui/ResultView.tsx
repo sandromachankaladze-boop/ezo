@@ -22,7 +22,7 @@ type Props = {
   onAgain: () => void;
 };
 
-// რაუნდის შედეგი: თითო პასუხი, ქულა, ბონუსი, რეკორდი
+// Round result: each answer, points, bonus, record
 export function ResultView({ letter, result, best, newRecord, onAgain }: Props) {
   return (
     <>

@@ -1,5 +1,5 @@
-// ყველა მარშრუტის მისამართი ერთ ადგილას.
-// ფაილები src/app/-ში ამ სახელებს უნდა ემთხვეოდეს (Expo Router).
+// All route paths in one place.
+// File names in src/app/ must match these paths (Expo Router).
 export const ROUTES = {
   home: '/',
   qalaqebi: '/qalaqebi',

@@ -1,31 +1,31 @@
-# გადაწყვეტილებები
+# Decisions
 
-ახალი ჩანაწერი ემატება ზემოდან: თარიღი, რა გადავწყვიტეთ, რატომ.
+Newest entry first: date, what we decided, why.
 
-## 2026-11-15: საქაღალდეების სტრუქტურა
-**გადაწყვეტილება:**
-- `src/screens`, `src/games/<თამაში>/{logic,ui}`, `src/components`, `src/navigation`,
+## 2026-11-15: Folder structure
+**Decision:**
+- `src/screens`, `src/games/<game>/{logic,ui}`, `src/components`, `src/navigation`,
   `src/services`, `src/i18n`, `src/theme`, `src/utils`, `assets`.
-- `src/app/` რჩება, რადგან Expo Router მარშრუტებს მხოლოდ იქ ეძებს. მასში მხოლოდ
-  მოკლე ფაილებია, რომლებიც ეკრანს `screens/`-დან ან `games/`-დან აბრუნებს.
-- `src/navigation/`-ში მარშრუტების მისამართები და header-ის სტილია.
-- ქართული ტექსტი `src/i18n/ka.ts`-შია, სიტყვების სიები `src/i18n/content/`-ში.
-- "ქალაქების" სახელი ყველგან `qalaqebi`-ა.
+- `src/app/` stays because Expo Router only looks for routes there. It contains only
+  thin files that re-export a screen from `screens/` or `games/`.
+- `src/navigation/` holds route paths and the header style.
+- Georgian UI text lives in `src/i18n/ka.ts`, word lists in `src/i18n/content/`.
+- The Cities game is named `qalaqebi` everywhere.
 
-**რატომ:** თითო თამაში ცალკე საქაღალდეშია, ამიტომ ახალი თამაშის დამატება ძველს არ ეხება.
-ლოგიკის UI-სგან გამოყოფა ტესტირებას ამარტივებს. ტექსტი ერთ ადგილასაა, ამიტომ მისი
-შესწორება კოდის ცოდნის გარეშეც შეიძლება.
+**Why:** one folder per game means adding a game never touches another one. Keeping
+logic apart from UI makes it easy to test. All text in one place means it can be
+corrected without knowing the code.
 
-## 2026-11-15: ფრეიმვორკი: React Native + Expo
-**განხილული ვარიანტები:** React Native + Expo, Flutter.
+## 2026-11-15: Framework: React Native + Expo
+**Options considered:** React Native + Expo, Flutter.
 
-**გადაწყვეტილება:** React Native + Expo (SDK 58, Expo Router, TypeScript).
+**Decision:** React Native + Expo (SDK 58, Expo Router, TypeScript).
 
-**რატომ:**
-- აპი ტელეფონზე Expo Go-თი QR კოდით ჩანს, Android Studio არ სჭირდება. დამწყებისთვის ეს მთავარია.
-- APK-ს EAS აგებს ღრუბელში.
-- JavaScript/TypeScript გავრცელებულია, ამიტომ დამხმარე პროგრამისტის პოვნა იოლია.
-- ჩვენი თამაშებისთვის (სიტყვები, უჯრები, მარტივი არკადა) React Native-ის სიჩქარე საკმარისია.
+**Why:**
+- The app opens on a phone through Expo Go by scanning a QR code; no Android Studio needed. This matters most for a beginner.
+- EAS builds the APK in the cloud.
+- JavaScript/TypeScript is widespread, so finding a helper developer is easy.
+- React Native is fast enough for our games (words, grids, a simple arcade).
 
-**რას ვთმობთ:** Flutter-ს ოდნავ უკეთესი გრაფიკული სიჩქარე აქვს სუსტ ტელეფონებზე
-და მზა არკადული ძრავი (Flame).
+**Trade-off:** Flutter is slightly smoother graphically on weak phones and has a ready
+arcade engine (Flame).

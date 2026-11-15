@@ -1,4 +1,4 @@
-// ტელეფონში მონაცემების შენახვა (ოფლაინ). ეკრანები AsyncStorage-ს პირდაპირ არ იყენებენ.
+// Saving data on the phone (offline). Screens never use AsyncStorage directly.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const bestKey = (gameId: string) => `${gameId}.best`;

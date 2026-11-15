@@ -30,12 +30,12 @@ export default function QalaqebiScreen() {
   const [newRecord, setNewRecord] = useState(false);
   const inputs = useRef<(TextInputInstance | null)[]>([]);
 
-  // საუკეთესო შედეგი ტელეფონშივე ინახება
+  // Best score is stored on the phone
   useEffect(() => {
     getBestScore(GAME_ID).then(setBest);
   }, []);
 
-  // წამზომი
+  // Countdown timer
   useEffect(() => {
     if (phase !== 'playing') return;
     if (secondsLeft <= 0) {
@@ -44,7 +44,7 @@ export default function QalaqebiScreen() {
     }
     const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(timer);
-    // finish ყოველ წამს ახლდება, ამიტომ dependency-ში არ გვჭირდება
+    // finish is recreated every second, so it is not needed in the dependency list
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, secondsLeft]);
 

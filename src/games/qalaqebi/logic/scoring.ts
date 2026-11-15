@@ -1,4 +1,4 @@
-// "ქალაქების" წესები: ასოს არჩევა, პასუხის შემოწმება, ქულები. აქ UI არ არის.
+// Cities game rules: picking a letter, checking answers, scoring. No UI here.
 import { normalize } from '@/utils/georgian';
 import { Category, CATEGORY_KEYS } from './categories';
 import { DICTIONARY, LETTERS } from './dictionary';
@@ -21,8 +21,8 @@ export type RoundResult = {
   total: number;
 };
 
-// ქულები: ლექსიკონში მოძებნილი სიტყვა 10 ქულაა. სწორ ასოზე დაწყებული, მაგრამ
-// ლექსიკონში ვერ ნაპოვნი სიტყვა 5 ქულაა (შეიძლება სწორია, უბრალოდ სიაში არ გვაქვს).
+// Points: a word found in the dictionary = 10. A word with the right first letter
+// that is not in the dictionary = 5 (it may be correct, our list is just incomplete).
 export const POINTS: Record<Verdict, number> = {
   correct: 10,
   unknown: 5,
@@ -40,14 +40,14 @@ export function checkAnswer(category: Category, letter: string, answer: string):
   if (!w) return 'empty';
   if (w[0] !== letter) return 'wrong-letter';
   const dict = DICTIONARY[category];
-  // "ლონდონ" ან "ლონდონი": ორივე ჩაითვალოს
+  // Accept the word with or without the final "ი" (e.g. "ლონდონ" / "ლონდონი")
   if (dict.has(w) || dict.has(w + 'ი')) return 'correct';
   if (w.length < 2) return 'wrong-letter';
   return 'unknown';
 }
 
-// დროის ბონუსი: დარჩენილი წამების ნახევარი, გამრავლებული ქულიანი პასუხების წილზე
-// (ასე ცარიელი ან შეცდომიანი პასუხებით ჩქარა დასრულება არ გამოგადგება).
+// Time bonus: half the seconds left, multiplied by the share of answers that scored
+// (so finishing fast with empty or wrong answers does not pay off).
 export function scoreRound(
   letter: string,
   answers: Record<Category, string>,

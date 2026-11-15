@@ -4,7 +4,7 @@ import { Category, CATEGORY_KEYS } from './categories';
 
 export const LETTERS = QALAQEBI_LETTERS;
 
-// სიტყვების სია -> სწრაფი საძიებო "კომპლექტი" თითო კატეგორიაზე
+// Word lists -> a fast lookup Set per category
 export const DICTIONARY = Object.fromEntries(
   CATEGORY_KEYS.map((cat) => [
     cat,

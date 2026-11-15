@@ -1,11 +1,11 @@
-// "ქალაქების" ჩაშენებული ლექსიკონი. მუშაობს ოფლაინ, ინტერნეტის გარეშე.
-// ახალი სიტყვის დასამატებლად ჩაწერე ის შესაბამის სიაში მძიმით.
-// თუ მოთამაშის სიტყვა სიაში არ არის, ქულის ნაწილს მაინც იღებს
-// (იხ. src/games/qalaqebi/logic/scoring.ts).
+// Built-in dictionary for the Cities game. Works offline.
+// To add a word, write it in the matching list, separated by a comma.
+// A word missing from the list still gets partial points
+// (see src/games/qalaqebi/logic/scoring.ts).
 
 import type { Category } from '@/games/qalaqebi/logic/categories';
 
-// ასოები, რომლებზეც ყველა კატეგორიაში მოიძებნება პასუხი.
+// Letters that have an answer in every category.
 export const QALAQEBI_LETTERS = [
   'ა', 'ბ', 'გ', 'დ', 'ე', 'ვ', 'ზ', 'თ', 'ი', 'კ', 'ლ', 'მ',
   'ნ', 'პ', 'ს', 'ტ', 'ფ', 'ქ', 'შ', 'ჩ', 'ხ', 'ჯ',

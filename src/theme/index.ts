@@ -1,5 +1,5 @@
 export { colors } from './colors';
 export { fonts } from './fonts';
 
-// რვეულის ერთი უჯრის ზომა პიქსელებში
+// Size of one notebook grid cell, in pixels
 export const CELL = 24;
