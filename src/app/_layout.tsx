@@ -35,7 +35,7 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={stackScreenOptions}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="qalaqebi" options={{ title: t.games.qalaqebi.title }} />
+        <Stack.Screen name="qalaqebi" options={{ headerShown: false, title: t.games.qalaqebi.title }} />
       </Stack>
     </>
   );

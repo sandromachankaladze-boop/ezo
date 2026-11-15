@@ -1,18 +1,13 @@
 import { StyleSheet, View } from 'react-native';
-import { InkButton } from '@/components/InkButton';
+import { ArcadeWindow } from '@/components/arcade/ArcadeWindow';
+import { NeonLetter } from '@/components/arcade/NeonLetter';
+import { PixelButton } from '@/components/arcade/PixelButton';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
-import { colors } from '@/theme';
-import { RoundResult, Verdict } from '../logic/scoring';
+import { arcade } from '@/theme';
+import { RoundResult } from '../logic/scoring';
 import { CATEGORIES } from './categoryMeta';
-import { LetterBadge } from './LetterBadge';
-
-const VERDICT_COLOR: Record<Verdict, string> = {
-  correct: colors.green,
-  unknown: colors.orange,
-  'wrong-letter': colors.red,
-  empty: colors.red,
-};
+import { VERDICT_COLOR } from './verdictColors';
 
 type Props = {
   letter: string;
@@ -22,68 +17,94 @@ type Props = {
   onAgain: () => void;
 };
 
-// Round result: each answer, points, bonus, record
+// Solo round result: score, each answer with its verdict, time bonus, record.
 export function ResultView({ letter, result, best, newRecord, onAgain }: Props) {
   return (
     <>
       <View style={styles.topRow}>
-        <LetterBadge letter={letter} />
-        <View style={{ alignItems: 'flex-end' }}>
-          <Txt weight="black" style={styles.total}>
+        <NeonLetter letter={letter} />
+        <View style={{ alignItems: 'flex-end', gap: 4 }}>
+          <Txt weight="pixel" style={styles.total}>
             {result.total}
           </Txt>
-          <Txt style={{ color: colors.muted }}>{t.qalaqebi.points}</Txt>
+          <Txt style={styles.totalLabel}>{t.qalaqebi.points}</Txt>
         </View>
       </View>
       {newRecord && (
         <View style={styles.record}>
-          <Txt weight="bold">{t.qalaqebi.newRecord}</Txt>
+          <Txt weight="black" style={styles.recordText}>
+            {t.qalaqebi.newRecord}
+          </Txt>
         </View>
       )}
 
-      {result.fields.map((f) => {
-        const cat = CATEGORIES.find((c) => c.key === f.category)!;
-        const color = VERDICT_COLOR[f.verdict];
-        return (
-          <View key={f.category} style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Txt style={{ color: colors.muted, fontSize: 14 }}>
-                {cat.emoji} {cat.label}
+      <ArcadeWindow title={t.qalaqebi.answersTitle}>
+        {result.fields.map((f) => {
+          const cat = CATEGORIES.find((c) => c.key === f.category)!;
+          const color = VERDICT_COLOR[f.verdict];
+          return (
+            <View key={f.category} style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Txt style={styles.cat}>
+                  {cat.emoji} {cat.label}
+                </Txt>
+                <Txt weight="black" style={styles.answer}>
+                  {f.answer || '—'}
+                </Txt>
+                <Txt style={[styles.verdict, { color }]}>{t.qalaqebi.verdict[f.verdict]}</Txt>
+              </View>
+              <Txt weight="pixel" style={[styles.points, { color }]}>
+                {f.points > 0 ? `+${f.points}` : '0'}
               </Txt>
-              <Txt weight="bold" style={{ fontSize: 18, color: colors.ink }}>
-                {f.answer || '—'}
-              </Txt>
-              <Txt style={{ fontSize: 13, color }}>{t.qalaqebi.verdict[f.verdict]}</Txt>
             </View>
-            <Txt weight="black" style={[styles.points, { color }]}>
-              {f.points > 0 ? `+${f.points}` : '0'}
-            </Txt>
-          </View>
-        );
-      })}
-      <View style={styles.row}>
-        <Txt style={{ flex: 1 }}>{t.qalaqebi.timeBonus}</Txt>
-        <Txt weight="black" style={[styles.points, { color: colors.ink }]}>
-          +{result.timeBonus}
-        </Txt>
-      </View>
-      <Txt style={{ color: colors.muted, marginVertical: 8 }}>{t.qalaqebi.best(best)}</Txt>
+          );
+        })}
+        <View style={[styles.row, { borderBottomWidth: 0 }]}>
+          <Txt style={{ flex: 1, fontSize: 14, color: arcade.ink }}>{t.qalaqebi.timeBonus}</Txt>
+          <Txt weight="pixel" style={[styles.points, { color: arcade.ink }]}>
+            +{result.timeBonus}
+          </Txt>
+        </View>
+      </ArcadeWindow>
 
-      <InkButton title={t.qalaqebi.again} onPress={onAgain} />
+      <Txt style={styles.best}>{t.qalaqebi.best(best)}</Txt>
+      <PixelButton title={t.qalaqebi.again} onPress={onAgain} />
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  total: { fontSize: 44, color: colors.ink, lineHeight: 56 },
-  record: { backgroundColor: colors.sticker, padding: 10, borderRadius: 10, marginBottom: 8, alignSelf: 'flex-start' },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  total: {
+    fontSize: 32,
+    lineHeight: 40,
+    color: arcade.yellow,
+    textShadowColor: arcade.orange,
+    textShadowRadius: 10,
+    textShadowOffset: { width: 0, height: 0 },
+  },
+  totalLabel: { fontSize: 13, color: arcade.crtText },
+  record: {
+    alignSelf: 'flex-start',
+    backgroundColor: arcade.yellow,
+    borderWidth: 2,
+    borderColor: arcade.ink,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  recordText: { fontSize: 14, color: arcade.ink },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    gap: 8,
+    paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: colors.grid,
+    borderBottomColor: '#E2D6C4',
   },
-  points: { fontSize: 22, minWidth: 48, textAlign: 'right' },
+  cat: { fontSize: 12, color: '#6B5A86' },
+  answer: { fontSize: 17, color: arcade.ink },
+  verdict: { fontSize: 12 },
+  points: { fontSize: 12, minWidth: 40, textAlign: 'right' },
+  best: { fontSize: 13, color: arcade.crtText, textAlign: 'center' },
 });

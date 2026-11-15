@@ -1,13 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TextInput, TextInputInstance, View } from 'react-native';
-import { InkButton } from '@/components/InkButton';
+import { ArcadeWindow } from '@/components/arcade/ArcadeWindow';
+import { NeonLetter } from '@/components/arcade/NeonLetter';
+import { GridPaper } from '@/components/arcade/Patterns';
+import { PixelButton } from '@/components/arcade/PixelButton';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
-import { colors, fonts } from '@/theme';
+import { arcade, fonts } from '@/theme';
 import { Category } from '../logic/categories';
 import { CATEGORIES } from './categoryMeta';
-import { LetterBadge } from './LetterBadge';
-import { Timer } from './Timer';
+import { TimerBar } from './Timer';
 
 type Props = {
   letter: string;
@@ -18,9 +20,10 @@ type Props = {
   playerLabel?: string; // shown in 2-player mode
 };
 
-// One player's turn: the letter, the timer and four answer fields.
+// One player's turn: neon letter, pixel timer and the neon notebook with four answer fields.
 export function AnswerForm({ letter, secondsLeft, answers, onChange, onDone, playerLabel }: Props) {
   const inputs = useRef<(TextInputInstance | null)[]>([]);
+  const [focused, setFocused] = useState<number | null>(null);
 
   // Put the cursor in the first field when the turn starts
   useEffect(() => {
@@ -31,43 +34,53 @@ export function AnswerForm({ letter, secondsLeft, answers, onChange, onDone, pla
   return (
     <>
       {playerLabel && (
-        <Txt weight="bold" style={styles.player}>
-          {playerLabel}
-        </Txt>
+        <View style={styles.player}>
+          <Txt weight="black" style={styles.playerText}>
+            {playerLabel}
+          </Txt>
+        </View>
       )}
       <View style={styles.topRow}>
-        <LetterBadge letter={letter} />
-        <Timer seconds={secondsLeft} />
+        <NeonLetter letter={letter} />
+        <TimerBar seconds={secondsLeft} />
       </View>
-      <Txt style={{ marginBottom: 12 }}>{t.qalaqebi.hint(letter)}</Txt>
 
-      {CATEGORIES.map((c, i) => {
-        const last = i === CATEGORIES.length - 1;
-        return (
-          <View key={c.key} style={{ marginBottom: 12 }}>
-            <Txt weight="bold" style={styles.label}>
-              {c.emoji} {c.label}
-            </Txt>
-            <TextInput
-              ref={(el) => {
-                inputs.current[i] = el;
-              }}
-              value={answers[c.key]}
-              onChangeText={(text) => onChange(c.key, text)}
-              placeholder={`${letter}...`}
-              placeholderTextColor={colors.muted}
-              style={styles.input}
-              autoCorrect={false}
-              autoCapitalize="none"
-              returnKeyType={last ? 'done' : 'next'}
-              onSubmitEditing={() => (last ? onDone() : inputs.current[i + 1]?.focus())}
-              submitBehavior={last ? 'blurAndSubmit' : 'submit'}
-            />
-          </View>
-        );
-      })}
+      <ArcadeWindow title={t.qalaqebi.notebook(letter)} barColor={arcade.magenta} bodyColor="transparent">
+        <GridPaper />
+        <View style={styles.margin} />
+        <View style={styles.fields}>
+          {CATEGORIES.map((c, i) => {
+            const last = i === CATEGORIES.length - 1;
+            return (
+              <View key={c.key} style={{ gap: 4 }}>
+                <Txt weight="black" style={[styles.label, { color: c.color }]}>
+                  {c.label}
+                </Txt>
+                <TextInput
+                  ref={(el) => {
+                    inputs.current[i] = el;
+                  }}
+                  accessibilityLabel={c.label}
+                  value={answers[c.key]}
+                  onChangeText={(text) => onChange(c.key, text)}
+                  onFocus={() => setFocused(i)}
+                  onBlur={() => setFocused((f) => (f === i ? null : f))}
+                  placeholder={`${letter}...`}
+                  placeholderTextColor="#6F5D8F"
+                  style={[styles.input, focused === i && styles.inputFocused]}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  returnKeyType={last ? 'done' : 'next'}
+                  onSubmitEditing={() => (last ? onDone() : inputs.current[i + 1]?.focus())}
+                  submitBehavior={last ? 'blurAndSubmit' : 'submit'}
+                />
+              </View>
+            );
+          })}
+        </View>
+      </ArcadeWindow>
 
-      <InkButton title={t.qalaqebi.done} onPress={onDone} style={{ marginTop: 12 }} />
+      <PixelButton title={t.qalaqebi.done} onPress={onDone} />
     </>
   );
 }
@@ -75,24 +88,34 @@ export function AnswerForm({ letter, secondsLeft, answers, onChange, onDone, pla
 const styles = StyleSheet.create({
   player: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.sticker,
+    backgroundColor: arcade.yellow,
+    borderWidth: 2,
+    borderColor: arcade.ink,
+    borderRadius: 6,
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 8,
+    paddingVertical: 2,
   },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  label: { marginBottom: 4, color: colors.ink },
+  playerText: { fontSize: 13, color: arcade.ink },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  margin: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 16,
+    width: 2,
+    backgroundColor: arcade.magenta,
+  },
+  fields: { gap: 12, paddingVertical: 4, paddingRight: 24 },
+  label: { fontSize: 13 },
   input: {
     fontFamily: fonts.regular,
-    fontSize: 20,
-    color: colors.pencil,
-    backgroundColor: colors.card,
-    borderWidth: 2,
-    borderColor: colors.grid,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minHeight: 52,
+    fontSize: 18,
+    color: arcade.cream,
+    backgroundColor: 'rgba(13,8,32,0.75)',
+    borderBottomWidth: 3,
+    borderBottomColor: arcade.teal,
+    paddingHorizontal: 8,
+    height: 44,
   },
+  inputFocused: { borderBottomColor: arcade.yellow },
 });

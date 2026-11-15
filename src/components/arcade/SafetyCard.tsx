@@ -1,8 +1,8 @@
 import { Modal, StyleSheet, View } from 'react-native';
-import { InkButton } from '@/components/InkButton';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { arcade } from '@/theme';
+import { PixelButton } from './PixelButton';
 
 // One-time "passengers only" card, shown on first launch (driver safety, see PLAN.md).
 export function SafetyCard({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -18,7 +18,7 @@ export function SafetyCard({ visible, onClose }: { visible: boolean; onClose: ()
           </View>
           <View style={styles.body}>
             <Txt style={styles.text}>{t.safety.text}</Txt>
-            <InkButton title={t.safety.ok} onPress={onClose} />
+            <PixelButton title={t.safety.ok} onPress={onClose} />
           </View>
         </View>
       </View>

@@ -1,15 +1,25 @@
-import { StyleSheet, View, ViewProps } from 'react-native';
+import { ScrollView, StyleSheet, View, ViewProps } from 'react-native';
 import { arcade } from '@/theme';
 import { Scanlines } from './Patterns';
 
 // The cabinet's screen: magenta body, steel bezel, dark glass with scanlines and a blue glow.
-export function CrtScreen({ children, style }: ViewProps) {
+// `scroll`: content scrolls inside the glass (long results, typing with the keyboard open).
+export function CrtScreen({ children, style, scroll }: ViewProps & { scroll?: boolean }) {
   return (
     <View style={styles.body}>
       <View style={styles.bezel}>
-        <View style={[styles.glass, style]}>
+        <View style={[styles.glass, scroll && styles.glassScroll, style]}>
           <Scanlines />
-          {children}
+          {scroll ? (
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              {children}
+            </ScrollView>
+          ) : (
+            children
+          )}
         </View>
       </View>
     </View>
@@ -49,4 +59,6 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 0 },
   },
+  glassScroll: { padding: 0 },
+  scrollContent: { padding: 12, gap: 12, flexGrow: 1 },
 });

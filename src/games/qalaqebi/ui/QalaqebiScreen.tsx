@@ -1,6 +1,6 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
-import { NotebookBackground } from '@/components/NotebookBackground';
+import { ArcadeShell } from '@/components/arcade/ArcadeShell';
 import { t } from '@/i18n';
 import { getBestScore, setBestScore } from '@/services/storage';
 import { Category } from '../logic/categories';
@@ -22,6 +22,7 @@ type Phase = 'intro' | 'playing' | 'handoff' | 'result';
 
 export default function QalaqebiScreen() {
   const [mode, setMode] = useState<Mode>('solo');
+  const [menuSel, setMenuSel] = useState<0 | 1>(0); // highlighted option in the mode menu
   const [phase, setPhase] = useState<Phase>('intro');
   const [player, setPlayer] = useState<0 | 1>(0); // whose turn it is in duel mode
   const [letter, setLetter] = useState(LETTERS[0]);
@@ -59,6 +60,7 @@ export default function QalaqebiScreen() {
 
   function startGame(newMode: Mode) {
     setMode(newMode);
+    setMenuSel(newMode === 'solo' ? 0 : 1);
     setLetter((prev) => randomLetter(prev));
     setPlayer(0);
     setFirstTurn(null);
@@ -94,52 +96,68 @@ export default function QalaqebiScreen() {
     }
   }
 
+  const title = t.games.qalaqebi.title;
+  const leave = () => router.back();
+  const toMenu = () => setPhase('intro');
+
+  if (phase === 'intro') {
+    const startSelected = () => startGame(menuSel === 0 ? 'solo' : 'duel');
+    return (
+      <ArcadeShell
+        title={title}
+        onBack={leave}
+        nav
+        scroll
+        deck={{
+          onUp: () => setMenuSel((s) => (s === 0 ? 1 : 0)),
+          onDown: () => setMenuSel((s) => (s === 0 ? 1 : 0)),
+          onOk: startSelected,
+          okEnabled: true,
+          onBack: leave,
+        }}>
+        <Intro
+          best={best}
+          mode={menuSel}
+          onPick={(m) => (m === menuSel ? startGame(m === 0 ? 'solo' : 'duel') : setMenuSel(m))}
+        />
+      </ArcadeShell>
+    );
+  }
+
   return (
-    <NotebookBackground>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          {phase === 'intro' && (
-            <Intro best={best} onSolo={() => startGame('solo')} onDuel={() => startGame('duel')} />
-          )}
+    <ArcadeShell title={title} onBack={toMenu} scroll>
+      {phase === 'playing' && (
+        <AnswerForm
+          key={`${letter}-${player}`} // fresh form for every turn
+          letter={letter}
+          secondsLeft={secondsLeft}
+          answers={answers}
+          onChange={(category, text) => setAnswers((a) => ({ ...a, [category]: text }))}
+          onDone={finishTurn}
+          playerLabel={mode === 'duel' ? t.qalaqebi.player(player + 1) : undefined}
+        />
+      )}
 
-          {phase === 'playing' && (
-            <AnswerForm
-              key={`${letter}-${player}`} // fresh form for every turn
-              letter={letter}
-              secondsLeft={secondsLeft}
-              answers={answers}
-              onChange={(category, text) => setAnswers((a) => ({ ...a, [category]: text }))}
-              onDone={finishTurn}
-              playerLabel={mode === 'duel' ? t.qalaqebi.player(player + 1) : undefined}
-            />
-          )}
+      {phase === 'handoff' && <Handoff player={player + 1} onGo={beginTurn} />}
 
-          {phase === 'handoff' && <Handoff player={player + 1} onGo={beginTurn} />}
+      {phase === 'result' && mode === 'solo' && soloResult && (
+        <ResultView
+          letter={letter}
+          result={soloResult}
+          best={best}
+          newRecord={newRecord}
+          onAgain={() => startGame('solo')}
+        />
+      )}
 
-          {phase === 'result' && mode === 'solo' && soloResult && (
-            <ResultView
-              letter={letter}
-              result={soloResult}
-              best={best}
-              newRecord={newRecord}
-              onAgain={() => startGame('solo')}
-            />
-          )}
-
-          {phase === 'result' && mode === 'duel' && duelResult && (
-            <DuelResultView
-              letter={letter}
-              result={duelResult}
-              onRematch={() => startGame('duel')}
-              onSolo={() => startGame('solo')}
-            />
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </NotebookBackground>
+      {phase === 'result' && mode === 'duel' && duelResult && (
+        <DuelResultView
+          letter={letter}
+          result={duelResult}
+          onRematch={() => startGame('duel')}
+          onSolo={() => startGame('solo')}
+        />
+      )}
+    </ArcadeShell>
   );
 }
-
-const styles = StyleSheet.create({
-  content: { padding: 20, paddingRight: 48, paddingBottom: 60 },
-});

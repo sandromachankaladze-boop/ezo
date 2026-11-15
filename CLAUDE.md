@@ -22,14 +22,15 @@ src/
       logic/            rules and scoring, no React/UI
       ui/               the screen and its parts
     qalaqebi/           Cities game (always named "qalaqebi": folder, route, files, storage key)
-  components/           shared UI: Txt, InkButton, NotebookBackground
-    arcade/             "Yard Arcade" pieces: YardBackground, Marquee, CrtScreen, ControlDeck,
-                        CoinDoor, BottomNav, PixelIcon, SafetyCard, Patterns
+  components/           shared UI: Txt (text with the Georgian font)
+    arcade/             "Yard Arcade" pieces: ArcadeShell (standard game screen), YardBackground,
+                        Marquee, CompactMarquee, CrtScreen, ControlDeck, CoinDoor, BottomNav,
+                        ArcadeWindow, PixelButton, NeonLetter, PixelIcon, SafetyCard, Patterns
   services/             storage (storage.ts); later backend, ads
   i18n/
     ka.ts               all Georgian UI text (t.home.title, t.qalaqebi.start ...)
     content/            game content: word lists (qalaqebi-words.ts)
-  theme/                colors.ts (`arcade` = new palette), fonts.ts (incl. pixel font), CELL
+  theme/                colors.ts (`arcade` palette), fonts.ts (Georgian + pixel font)
   utils/                general helpers (georgian.ts: normalize, Mtavruli -> Mkhedruli)
 assets/                 icons, images (still the Expo template ones, to be replaced)
 docs/decisions.md       decisions log
@@ -40,7 +41,7 @@ docs/design-brief.md    visual direction ("Yard Arcade") + mockup link
 - **One screen per file.** A file in `src/app/` only re-exports a screen; the code lives in `screens/` or `games/<game>/ui/`.
 - **One folder per game**, with `logic/` (rules, scoring) separate from `ui/`. `logic/` does not import React.
 - **No hard-coded Georgian text or word lists in components.** UI text goes in `src/i18n/ka.ts`, words and content in `src/i18n/content/`.
-- Colors and fonts only from `@/theme`.
+- Colors and fonts only from `@/theme`. New game screens use `ArcadeShell` (see docs/design-brief.md).
 - Data is saved only through `src/services/`; screens never use AsyncStorage directly.
 - New route: a file in `src/app/` + its path in `src/navigation/routes.ts`.
 - Imports use the `@/...` alias (= `src/`).

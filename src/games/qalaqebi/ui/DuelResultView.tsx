@@ -1,19 +1,14 @@
 import { StyleSheet, View } from 'react-native';
-import { InkButton } from '@/components/InkButton';
+import { ArcadeWindow } from '@/components/arcade/ArcadeWindow';
+import { NeonLetter } from '@/components/arcade/NeonLetter';
+import { PixelButton } from '@/components/arcade/PixelButton';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
-import { colors } from '@/theme';
+import { arcade } from '@/theme';
 import { DuelResult } from '../logic/duel';
-import { FieldResult, Verdict } from '../logic/scoring';
+import { FieldResult } from '../logic/scoring';
 import { CATEGORIES } from './categoryMeta';
-import { LetterBadge } from './LetterBadge';
-
-const VERDICT_COLOR: Record<Verdict, string> = {
-  correct: colors.green,
-  unknown: colors.orange,
-  'wrong-letter': colors.red,
-  empty: colors.red,
-};
+import { SHARED_COLOR, VERDICT_COLOR } from './verdictColors';
 
 type Props = {
   letter: string;
@@ -30,78 +25,80 @@ export function DuelResultView({ letter, result, onRematch, onSolo }: Props) {
   return (
     <>
       <View style={styles.topRow}>
-        <LetterBadge letter={letter} />
+        <NeonLetter letter={letter} size={56} />
         <View style={styles.banner}>
-          <Txt weight="black" style={{ fontSize: 18, color: colors.ink }}>
+          <Txt weight="black" style={styles.bannerText}>
             {banner}
           </Txt>
         </View>
       </View>
 
-      <View style={styles.headRow}>
-        <Txt weight="bold" style={styles.col}>
-          {t.qalaqebi.player(1)}
-        </Txt>
-        <Txt weight="bold" style={styles.col}>
-          {t.qalaqebi.player(2)}
-        </Txt>
-      </View>
-
-      {CATEGORIES.map((cat, i) => (
-        <View key={cat.key} style={styles.block}>
-          <Txt style={{ color: colors.muted, fontSize: 14 }}>
-            {cat.emoji} {cat.label}
+      <ArcadeWindow title={t.qalaqebi.answersTitle}>
+        <View style={styles.cols}>
+          <Txt weight="black" style={styles.head}>
+            {t.qalaqebi.player(1)}
           </Txt>
-          <View style={styles.row}>
-            <Cell field={p1.fields[i]} />
-            <Cell field={p2.fields[i]} />
+          <Txt weight="black" style={styles.head}>
+            {t.qalaqebi.player(2)}
+          </Txt>
+        </View>
+        {CATEGORIES.map((cat, i) => (
+          <View key={cat.key} style={styles.block}>
+            <Txt style={styles.cat}>
+              {cat.emoji} {cat.label}
+            </Txt>
+            <View style={styles.cols}>
+              <Cell field={p1.fields[i]} />
+              <Cell field={p2.fields[i]} />
+            </View>
+          </View>
+        ))}
+        <View style={[styles.block, { borderBottomWidth: 0 }]}>
+          <Txt style={styles.cat}>{t.qalaqebi.timeBonus}</Txt>
+          <View style={styles.cols}>
+            <Txt weight="pixel" style={styles.bonus}>
+              +{p1.timeBonus}
+            </Txt>
+            <Txt weight="pixel" style={styles.bonus}>
+              +{p2.timeBonus}
+            </Txt>
           </View>
         </View>
-      ))}
+      </ArcadeWindow>
 
-      <View style={styles.block}>
-        <Txt style={{ color: colors.muted, fontSize: 14 }}>{t.qalaqebi.timeBonus}</Txt>
-        <View style={styles.row}>
-          <Txt weight="bold" style={styles.col}>+{p1.timeBonus}</Txt>
-          <Txt weight="bold" style={styles.col}>+{p2.timeBonus}</Txt>
-        </View>
+      <View style={styles.cols}>
+        <Total value={p1.total} win={result.winner === 0} />
+        <Total value={p2.total} win={result.winner === 1} />
       </View>
 
-      <View style={[styles.row, { marginVertical: 12 }]}>
-        <Total label={t.qalaqebi.total} value={p1.total} win={result.winner === 0} />
-        <Total label={t.qalaqebi.total} value={p2.total} win={result.winner === 1} />
-      </View>
-
-      <View style={{ gap: 12 }}>
-        <InkButton title={t.qalaqebi.rematch} onPress={onRematch} />
-        <InkButton title={t.qalaqebi.toSolo} onPress={onSolo} variant="outline" />
-      </View>
+      <PixelButton title={t.qalaqebi.rematch} onPress={onRematch} />
+      <PixelButton title={t.qalaqebi.toSolo} onPress={onSolo} color={arcade.yellow} />
     </>
   );
 }
 
 function Cell({ field }: { field: FieldResult }) {
-  const color = field.shared ? colors.orange : VERDICT_COLOR[field.verdict];
+  const color = field.shared ? SHARED_COLOR : VERDICT_COLOR[field.verdict];
   return (
-    <View style={styles.col}>
-      <Txt weight="bold" style={{ fontSize: 16, color: colors.ink }} numberOfLines={1}>
+    <View style={{ flex: 1 }}>
+      <Txt weight="black" style={styles.answer} numberOfLines={1}>
         {field.answer || '—'}
       </Txt>
-      <Txt style={{ fontSize: 12, color }} numberOfLines={2}>
+      <Txt style={[styles.verdict, { color }]} numberOfLines={2}>
         {field.shared ? t.qalaqebi.shared : t.qalaqebi.verdict[field.verdict]}
       </Txt>
-      <Txt weight="black" style={{ fontSize: 18, color }}>
+      <Txt weight="pixel" style={[styles.points, { color }]}>
         {field.points > 0 ? `+${field.points}` : '0'}
       </Txt>
     </View>
   );
 }
 
-function Total({ label, value, win }: { label: string; value: number; win: boolean }) {
+function Total({ value, win }: { value: number; win: boolean }) {
   return (
-    <View style={[styles.col, styles.total, win && styles.totalWin]}>
-      <Txt style={{ color: colors.muted, fontSize: 13 }}>{label}</Txt>
-      <Txt weight="black" style={{ fontSize: 32, lineHeight: 42, color: colors.ink }}>
+    <View style={[styles.total, win && styles.totalWin]}>
+      <Txt style={styles.totalLabel}>{t.qalaqebi.total}</Txt>
+      <Txt weight="pixel" style={[styles.totalNum, { color: win ? arcade.green : arcade.cream }]}>
         {value}
       </Txt>
     </View>
@@ -109,19 +106,35 @@ function Total({ label, value, win }: { label: string; value: number; win: boole
 }
 
 const styles = StyleSheet.create({
-  topRow: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12 },
-  banner: { flex: 1, backgroundColor: colors.sticker, padding: 10, borderRadius: 10 },
-  headRow: { flexDirection: 'row', gap: 12, marginBottom: 4 },
-  block: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.grid },
-  row: { flexDirection: 'row', gap: 12 },
-  col: { flex: 1 },
-  total: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: 12,
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  banner: {
+    flex: 1,
+    backgroundColor: arcade.yellow,
     borderWidth: 2,
-    borderColor: colors.grid,
-    backgroundColor: colors.card,
+    borderColor: arcade.ink,
+    borderRadius: 8,
+    padding: 10,
   },
-  totalWin: { borderColor: colors.green },
+  bannerText: { fontSize: 17, color: arcade.ink },
+  cols: { flexDirection: 'row', gap: 12 },
+  head: { flex: 1, fontSize: 13, color: arcade.ink },
+  block: { paddingVertical: 6, gap: 2, borderBottomWidth: 1, borderBottomColor: '#E2D6C4' },
+  cat: { fontSize: 12, color: '#6B5A86' },
+  answer: { fontSize: 15, color: arcade.ink },
+  verdict: { fontSize: 11, lineHeight: 15 },
+  points: { fontSize: 11, marginTop: 2 },
+  bonus: { flex: 1, fontSize: 11, color: arcade.ink },
+  total: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 3,
+    borderColor: arcade.muted,
+    backgroundColor: 'rgba(255,244,224,0.06)',
+  },
+  totalWin: { borderColor: arcade.green, backgroundColor: 'rgba(76,201,76,0.12)' },
+  totalLabel: { fontSize: 12, color: arcade.crtText },
+  totalNum: { fontSize: 24, lineHeight: 30 },
 });
