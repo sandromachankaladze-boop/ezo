@@ -1,36 +1,39 @@
-import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, TextInputInstance, View } from 'react-native';
-import { InkButton } from '@/components/InkButton';
+import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { NotebookBackground } from '@/components/NotebookBackground';
-import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { getBestScore, setBestScore } from '@/services/storage';
-import { colors, fonts } from '@/theme';
 import { Category } from '../logic/categories';
 import { LETTERS } from '../logic/dictionary';
+import { DuelResult, scoreDuel, Turn } from '../logic/duel';
 import { randomLetter, ROUND_SECONDS, RoundResult, scoreRound } from '../logic/scoring';
-import { CATEGORIES } from './categoryMeta';
+import { AnswerForm } from './AnswerForm';
+import { DuelResultView } from './DuelResultView';
+import { Handoff } from './Handoff';
 import { Intro } from './Intro';
-import { LetterBadge } from './LetterBadge';
 import { ResultView } from './ResultView';
-import { Timer } from './Timer';
 
 const GAME_ID = 'qalaqebi';
 const EMPTY: Record<Category, string> = { city: '', country: '', animal: '', thing: '' };
 
-type Phase = 'intro' | 'playing' | 'result';
+type Mode = 'solo' | 'duel';
+// intro -> playing -> (duel only: handoff -> playing) -> result
+type Phase = 'intro' | 'playing' | 'handoff' | 'result';
 
 export default function QalaqebiScreen() {
+  const [mode, setMode] = useState<Mode>('solo');
   const [phase, setPhase] = useState<Phase>('intro');
+  const [player, setPlayer] = useState<0 | 1>(0); // whose turn it is in duel mode
   const [letter, setLetter] = useState(LETTERS[0]);
   const [answers, setAnswers] = useState(EMPTY);
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
-  const [result, setResult] = useState<RoundResult | null>(null);
+  const [firstTurn, setFirstTurn] = useState<Turn | null>(null); // Player 1's answers in duel mode
+  const [soloResult, setSoloResult] = useState<RoundResult | null>(null);
+  const [duelResult, setDuelResult] = useState<DuelResult | null>(null);
   const [best, setBest] = useState(0);
   const [newRecord, setNewRecord] = useState(false);
-  const inputs = useRef<(TextInputInstance | null)[]>([]);
 
-  // Best score is stored on the phone
+  // Best score (solo only) is stored on the phone
   useEffect(() => {
     getBestScore(GAME_ID).then(setBest);
   }, []);
@@ -39,33 +42,55 @@ export default function QalaqebiScreen() {
   useEffect(() => {
     if (phase !== 'playing') return;
     if (secondsLeft <= 0) {
-      finish();
+      finishTurn();
       return;
     }
     const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(timer);
-    // finish is recreated every second, so it is not needed in the dependency list
+    // finishTurn is recreated every second, so it is not needed in the dependency list
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, secondsLeft]);
 
-  function start() {
-    setLetter((prev) => randomLetter(prev));
+  function beginTurn() {
     setAnswers(EMPTY);
     setSecondsLeft(ROUND_SECONDS);
-    setResult(null);
-    setNewRecord(false);
     setPhase('playing');
-    setTimeout(() => inputs.current[0]?.focus(), 300);
   }
 
-  function finish() {
-    const r = scoreRound(letter, answers, Math.max(0, secondsLeft));
-    setResult(r);
-    setPhase('result');
-    if (r.total > best) {
-      setBest(r.total);
-      setNewRecord(true);
-      setBestScore(GAME_ID, r.total);
+  function startGame(newMode: Mode) {
+    setMode(newMode);
+    setLetter((prev) => randomLetter(prev));
+    setPlayer(0);
+    setFirstTurn(null);
+    setSoloResult(null);
+    setDuelResult(null);
+    setNewRecord(false);
+    beginTurn();
+  }
+
+  function finishTurn() {
+    const turn: Turn = { answers, secondsLeft: Math.max(0, secondsLeft) };
+
+    if (mode === 'solo') {
+      const r = scoreRound(letter, turn.answers, turn.secondsLeft);
+      setSoloResult(r);
+      setPhase('result');
+      if (r.total > best) {
+        setBest(r.total);
+        setNewRecord(true);
+        setBestScore(GAME_ID, r.total);
+      }
+      return;
+    }
+
+    if (player === 0) {
+      // Player 1 is done: hide the answers and pass the phone
+      setFirstTurn(turn);
+      setPlayer(1);
+      setPhase('handoff');
+    } else {
+      setDuelResult(scoreDuel(letter, firstTurn!, turn));
+      setPhase('result');
     }
   }
 
@@ -73,48 +98,41 @@ export default function QalaqebiScreen() {
     <NotebookBackground>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          {phase === 'intro' && <Intro best={best} onStart={start} />}
-
-          {phase === 'playing' && (
-            <>
-              <View style={styles.topRow}>
-                <LetterBadge letter={letter} />
-                <Timer seconds={secondsLeft} />
-              </View>
-              <Txt style={{ marginBottom: 12 }}>{t.qalaqebi.hint(letter)}</Txt>
-
-              {CATEGORIES.map((c, i) => {
-                const last = i === CATEGORIES.length - 1;
-                return (
-                  <View key={c.key} style={{ marginBottom: 12 }}>
-                    <Txt weight="bold" style={styles.label}>
-                      {c.emoji} {c.label}
-                    </Txt>
-                    <TextInput
-                      ref={(el) => {
-                        inputs.current[i] = el;
-                      }}
-                      value={answers[c.key]}
-                      onChangeText={(text) => setAnswers((a) => ({ ...a, [c.key]: text }))}
-                      placeholder={`${letter}...`}
-                      placeholderTextColor={colors.muted}
-                      style={styles.input}
-                      autoCorrect={false}
-                      autoCapitalize="none"
-                      returnKeyType={last ? 'done' : 'next'}
-                      onSubmitEditing={() => (last ? finish() : inputs.current[i + 1]?.focus())}
-                      submitBehavior={last ? 'blurAndSubmit' : 'submit'}
-                    />
-                  </View>
-                );
-              })}
-
-              <InkButton title={t.qalaqebi.done} onPress={finish} style={{ marginTop: 12 }} />
-            </>
+          {phase === 'intro' && (
+            <Intro best={best} onSolo={() => startGame('solo')} onDuel={() => startGame('duel')} />
           )}
 
-          {phase === 'result' && result && (
-            <ResultView letter={letter} result={result} best={best} newRecord={newRecord} onAgain={start} />
+          {phase === 'playing' && (
+            <AnswerForm
+              key={`${letter}-${player}`} // fresh form for every turn
+              letter={letter}
+              secondsLeft={secondsLeft}
+              answers={answers}
+              onChange={(category, text) => setAnswers((a) => ({ ...a, [category]: text }))}
+              onDone={finishTurn}
+              playerLabel={mode === 'duel' ? t.qalaqebi.player(player + 1) : undefined}
+            />
+          )}
+
+          {phase === 'handoff' && <Handoff player={player + 1} onGo={beginTurn} />}
+
+          {phase === 'result' && mode === 'solo' && soloResult && (
+            <ResultView
+              letter={letter}
+              result={soloResult}
+              best={best}
+              newRecord={newRecord}
+              onAgain={() => startGame('solo')}
+            />
+          )}
+
+          {phase === 'result' && mode === 'duel' && duelResult && (
+            <DuelResultView
+              letter={letter}
+              result={duelResult}
+              onRematch={() => startGame('duel')}
+              onSolo={() => startGame('solo')}
+            />
           )}
         </ScrollView>
       </KeyboardAvoidingView>
@@ -124,18 +142,4 @@ export default function QalaqebiScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: 20, paddingRight: 48, paddingBottom: 60 },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  label: { marginBottom: 4, color: colors.ink },
-  input: {
-    fontFamily: fonts.regular,
-    fontSize: 20,
-    color: colors.pencil,
-    backgroundColor: colors.card,
-    borderWidth: 2,
-    borderColor: colors.grid,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minHeight: 52,
-  },
 });

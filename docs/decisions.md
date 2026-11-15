@@ -2,6 +2,16 @@
 
 Newest entry first: date, what we decided, why.
 
+## 2026-11-15: "qalaqebi" 2-player mode
+**Decision:**
+- Pass-and-play on one phone: same letter for both, Player 1 plays 60 s, a hand-off
+  screen hides the answers, then Player 2 plays 60 s with empty fields.
+- Classic yard rule: a word both players wrote gets half points for each (rounded up).
+- Each player's time bonus works as in solo mode. The saved record counts solo games only.
+
+**Why:** the plan asks for 1-2 players; one phone needs no internet or accounts,
+which fits the metro use case. Online challenges come later with the sharing feature.
+
 ## 2026-11-15: Folder structure
 **Decision:**
 - `src/screens`, `src/games/<game>/{logic,ui}`, `src/components`, `src/navigation`,

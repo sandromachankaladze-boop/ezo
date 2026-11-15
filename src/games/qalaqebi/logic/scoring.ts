@@ -12,6 +12,7 @@ export type FieldResult = {
   answer: string;
   verdict: Verdict;
   points: number;
+  shared?: boolean; // 2-player mode: both players wrote the same word
 };
 
 export type RoundResult = {
